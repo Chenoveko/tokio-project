@@ -1,0 +1,5 @@
+aws_account_id = "181053172120"
+aws_region     = "eu-south-2"
+ecr_registry = "181053172120.dkr.ecr.eu-south-2.amazonaws.com"
+ecr_repo     = "ecr-techwave"
+image_tag = "latest"

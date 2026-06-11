@@ -1,4 +1,7 @@
 variable "repository_name" {
   type = string
-  default = "techwave-ecr"
+}
+
+variable "force_delete" {
+  type = bool
 }

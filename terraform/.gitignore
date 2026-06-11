@@ -1,2 +1,3 @@
 /environments/dev/.terraform*
-/environments/dev/secrets.tfvars
+/environments/dev/secrets.*
+/environments/dev/terraform*
