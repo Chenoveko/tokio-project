@@ -35,6 +35,9 @@ jobs:
   
   sonarqube:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: techwave-app
     steps:
     - uses: actions/checkout@v7
       with:
@@ -45,6 +48,9 @@ jobs:
 
   gitleaks:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: techwave-app
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v7
@@ -56,6 +62,9 @@ jobs:
     needs: [build-job, sonarqube, gitleaks]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: techwave-app
     permissions:
       id-token: write  
       contents: read
