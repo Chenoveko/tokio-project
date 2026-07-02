@@ -1,0 +1,164 @@
+pipeline {
+    agent any
+
+    options {
+        skipDefaultCheckout(true)
+        ansiColor('xterm')
+    }
+
+    parameters {
+        booleanParam(
+            name: 'TESTS',
+            defaultValue: false,
+            description: 'Execute Tests'
+        )
+
+        booleanParam(
+            name: 'CREATE_INFRA',
+            defaultValue: false,
+            description: 'Create infrastructure with Terraform in Proxmox'
+        )
+
+        booleanParam(
+            name: 'CONFIGURE_INFRA',
+            defaultValue: false,
+            description: 'Configure infrastructure with Ansible'
+        )
+
+        booleanParam(
+            name: 'DESTROY_INFRA',
+            defaultValue: false,
+            description: 'Destroy infrastructure with Terraform in Proxmox'
+        )
+    }
+
+    stages {
+
+        stage('Checkout') {
+
+            when {
+                expression {
+                    params.CREATE_INFRA ||
+                    params.TESTS
+                }
+            }
+
+            steps {
+                cleanWs()
+                git(
+                    url: 'git@github.com:Chenoveko/homelab.git',
+                    branch: 'main',
+                    credentialsId: 'master-ssh'
+                )
+            }
+        }
+
+        stage('Tests') {
+            when {
+                expression { params.TESTS }
+            }
+
+            parallel {
+                stage('Terraform test') {
+                    steps {
+                        sh '''
+                            echo "Running terraform tests..."
+                            cd proxmox/terraform
+                            terraform init -backend=false
+                            terraform test
+                        '''
+                    }
+                }
+
+                stage('Terratest') {
+                    agent {
+                        docker {
+                            image 'golang:1.18-alpine'
+                            reuseNode true // Workspace syncs between host and container
+                        }
+                    }
+                    steps {
+                        sh '''
+                            echo "Running terratest..."
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage('Create Infra') {
+            when {
+                expression { params.CREATE_INFRA }
+            }
+
+            steps {
+                echo 'Creating infrastructure...'
+
+                withCredentials([
+                    sshUserPrivateKey(
+                        credentialsId: 'master-ssh',
+                        keyFileVariable: 'SSH_KEY_FILE',
+                        usernameVariable: 'SSH_USER'
+                    )
+                ]) {
+                    sh '''
+                        export TF_VAR_ssh_private_key="$(cat $SSH_KEY_FILE)"
+                        export TF_VAR_ssh_public_key="$(ssh-keygen -y -f $SSH_KEY_FILE)"
+                        chmod +x proxmox/terraform/create_infra.sh
+                        proxmox/terraform/create_infra.sh
+                    '''
+                }
+            }
+        }
+
+        stage('Configure Infra') {
+            when {
+                expression { params.CONFIGURE_INFRA }
+            }
+
+            steps {
+                echo 'Configuring infrastructure...'
+
+                withCredentials([
+                    sshUserPrivateKey(
+                        credentialsId: 'master-ssh',
+                        keyFileVariable: 'SSH_KEY_FILE',
+                    )
+                ]) {
+                    sh '''
+                        ssh -i "$SSH_KEY_FILE" \
+                            -o StrictHostKeyChecking=no \
+                            -o BatchMode=yes \
+                            "ansible@192.168.1.15" \
+                            "/home/ansible/.local/bin/ansible-playbook /home/ansible/playbooks/main.yml"
+                    '''
+                }
+            }
+        }
+
+        stage('Destroy Infra') {
+            when {
+                expression { params.DESTROY_INFRA }
+            }
+
+            steps {
+                echo 'Destroying infrastructure...'
+
+                withCredentials([
+                    sshUserPrivateKey(
+                        credentialsId: 'master-ssh',
+                        keyFileVariable: 'SSH_KEY_FILE',
+                        usernameVariable: 'SSH_USER'
+                    )
+                ]) {
+                    sh '''
+                        export TF_VAR_ssh_private_key="$(cat $SSH_KEY_FILE)"
+                        export TF_VAR_ssh_public_key="$(ssh-keygen -y -f $SSH_KEY_FILE)"
+                        chmod +x proxmox/terraform/destroy_infra.sh
+                        proxmox/terraform/destroy_infra.sh
+                    '''
+                }
+            }
+        }
+    }
+}

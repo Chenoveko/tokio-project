@@ -51,6 +51,6 @@ SECONDS=$((DURATION % 60))
 
 echo ""
 echo "========================================="
-echo "Build process completed!"
+echo "Jenkins Build process completed!"
 echo "Total build time: ${HOURS}h ${MINUTES}m ${SECONDS}s"
 echo "========================================="

@@ -49,6 +49,6 @@ SECONDS=$((DURATION % 60))
 
 echo ""
 echo "========================================="
-echo "Clean process completed!"
+echo "Jenkins Clean process completed!"
 echo "Total clean time: ${HOURS}h ${MINUTES}m ${SECONDS}s"
 echo "========================================="

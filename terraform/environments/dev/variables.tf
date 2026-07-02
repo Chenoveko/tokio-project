@@ -90,3 +90,36 @@ variable "force_delete" {
   type        = bool
   default     = true
 }
+
+########################
+#         EKS          #
+########################
+variable "cluster_name" {
+  description = "EKS cluster name"
+  type        = string
+}
+
+variable "cluster_version" {
+  description = "Kubernetes version"
+  type        = string
+}
+
+variable "node_instance_type" {
+  description = "Instance type for worker nodes"
+  type        = string
+}
+
+variable "node_desired_size" {
+  description = "Desired number of worker nodes"
+  type        = number
+}
+
+variable "node_min_size" {
+  description = "Minimum number of worker nodes"
+  type        = number
+}
+
+variable "node_max_size" {
+  description = "Maximum number of worker nodes"
+  type        = number
+}

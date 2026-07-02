@@ -58,6 +58,6 @@ SECONDS=$((DURATION % 60))
 
 echo ""
 echo "========================================="
-echo "Build process completed!"
+echo "Packer Build process completed!"
 echo "Total build time: ${HOURS}h ${MINUTES}m ${SECONDS}s"
 echo "========================================="

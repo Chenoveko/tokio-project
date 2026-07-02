@@ -5,6 +5,12 @@ terraform {
       version = "~> 6.49.0"
     }
   }
+  backend "s3" {
+    bucket         = "techwave-tfstate-dev"
+    key            = "dev/terraform.tfstate"
+    region         = "eu-south-2"
+    encrypt        = true
+  }
 }
 
 provider "aws" {

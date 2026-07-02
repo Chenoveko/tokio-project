@@ -95,7 +95,7 @@ build {
     inline = ["cd /app && npm run build"]
   }
 
-  # Tag + Push a to ECR
+  # Tag + Push to ECR
   post-processors {
     post-processor "docker-tag" {
       repository = "${var.ecr_registry}/${var.ecr_repo}"

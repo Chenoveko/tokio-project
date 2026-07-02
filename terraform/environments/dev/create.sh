@@ -16,6 +16,11 @@ if ! command -v terraform &> /dev/null; then
     exit 1
 fi
 
+# Load Credentials 
+export AWS_ACCESS_KEY_ID=$(grep 'aws_access_key' secrets.tfvars | cut -d'"' -f2)
+export AWS_SECRET_ACCESS_KEY=$(grep 'aws_secret_key' secrets.tfvars | cut -d'"' -f2)
+export AWS_DEFAULT_REGION=$(grep 'aws_region' terraform.tfvars | cut -d'"' -f2)
+
 # Print Terraform version
 echo "Printing Terraform version..."
 terraform version
