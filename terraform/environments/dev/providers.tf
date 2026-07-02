@@ -6,10 +6,10 @@ terraform {
     }
   }
   backend "s3" {
-    bucket         = "techwave-tfstate-dev"
-    key            = "dev/terraform.tfstate"
-    region         = "eu-south-2"
-    encrypt        = true
+    bucket  = "techwave-tfstate-dev"
+    key     = "dev/terraform.tfstate"
+    region  = "eu-south-2"
+    encrypt = true
   }
 }
 
