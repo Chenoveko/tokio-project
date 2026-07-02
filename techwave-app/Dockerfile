@@ -1,10 +1,10 @@
 FROM node:alpine3.23 AS builder
 WORKDIR /app
 
-COPY techwave-app/package*.json ./
+COPY package*.json ./
 RUN npm ci
 
-COPY techwave-app/ .
+COPY . .
 RUN npm run build
 
 FROM nginx:1.31
