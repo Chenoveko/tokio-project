@@ -13,6 +13,7 @@ jobs:
       run:
         working-directory: techwave-app
     strategy:
+      fail-fast: false
       matrix:
         node: [ 20, 22, 24 ]
     steps:
